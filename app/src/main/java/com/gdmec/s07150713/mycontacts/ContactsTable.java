@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.renderscript.Sampler;
 import android.util.Log;
 
+import java.util.Vector;
+
 /**
  * Created by Administrator on 2016/10/24.
  */
@@ -69,4 +71,77 @@ public class ContactsTable {
     }
 
 
+    public User[] findUserByKey(String key){
+        Vector<User> v = new Vector<User>();
+        Cursor cursor = null;
+        try{
+            cursor = db.find("select * from"+TABLENAME+"where"+User.NAME+" like '%"+key+"%' "+" or "+User.MOBILE+" like '%"+key+"%' "+" or "+User.QQ+" like '"+key+"'" ,null);
+            while(cursor.moveToNext()) {
+                User temp = new User();
+                temp.setId_DB(cursor.getInt(cursor.getColumnIndex("id_DB")));
+                temp.setName(cursor.getString(cursor.getColumnIndex(User.NAME)));
+                temp.setMobile(cursor.getString(cursor.getColumnIndex(User.MOBILE)));
+                temp.setDanwei(cursor.getString(cursor.getColumnIndex(User.DANWEI)));
+                temp.setQq(cursor.getString(cursor.getColumnIndex(User.QQ)));
+                temp.setAddress(cursor.getString(cursor.getColumnIndex(User.ADDRESS)));
+                v.add(temp);
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }finally{
+            if(cursor!=null){
+                cursor.close();
+            }
+            db.closeConnection();
+        }
+        if(v.size()>0){
+            return v.toArray(new User[] {});
+        }else{
+            User[] users = new User[1];
+            User user = new User();
+            user.setName("无结果");
+            users[0]=user;
+            return users;
+        }
+
+
+
+    }
+    public boolean deleteByUser(User user){
+        return db.delete(TABLENAME,"id_DB=?",new String[]{user.getId_DB()+""});
+    }
+
+    public User[] getAllUsers() {
+        Vector<User> v = new Vector<User>();
+        Cursor cursor = null;
+        try{
+            cursor = db.find("select * from "+TABLENAME ,null);
+            while(cursor.moveToNext()) {
+                User temp = new User();
+                temp.setId_DB(cursor.getInt(cursor.getColumnIndex("id_DB")));
+                temp.setName(cursor.getString(cursor.getColumnIndex(User.NAME)));
+                temp.setMobile(cursor.getString(cursor.getColumnIndex(User.MOBILE)));
+                temp.setDanwei(cursor.getString(cursor.getColumnIndex(User.DANWEI)));
+                temp.setQq(cursor.getString(cursor.getColumnIndex(User.QQ)));
+                temp.setAddress(cursor.getString(cursor.getColumnIndex(User.ADDRESS)));
+                v.add(temp);
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }finally{
+            if(cursor!=null){
+                cursor.close();
+            }
+            db.closeConnection();
+        }
+        if(v.size()>0){
+            return v.toArray(new User[] {});
+        }else{
+            User[] users = new User[1];
+            User user = new User();
+            user.setName("无结果");
+            users[0]=user;
+            return users;
+        }
+    }
 }
